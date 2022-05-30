@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"goJoe/internal/pgql"
-	"log"
+	"goJoe/internal/facade"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -14,16 +14,12 @@ import (
 var i int
 
 func main() {
+	err := godotenv.Load("local.env")
 
-	token := getBotToken()
-	db := pgql.InitDatabase()
-	defer db.Close()
-
-	bot, err := discordgo.New("Bot " + token) //figure out how to get the token from .env
+	bot, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN")) //figure out how to get the token from .env
 	if err != nil {
 		panic(err)
 	}
-
 	// register events
 	bot.AddHandler(ready)
 	bot.AddHandler(messageCreate)
@@ -51,27 +47,25 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	switch m.Content {
+	command := strings.Fields(m.Content)[0]
+
+	switch command {
 	case "!enditall":
 		{
 			i = 1
 			s.ChannelMessageSend(m.ChannelID, "Goodbye!")
 			return
 		}
-	case "!hey":
+	case "!register":
 		{
-			s.ChannelMessageSend(m.ChannelID, "SUUP!")
+			res := facade.Register(m)
+			s.ChannelMessageSend(m.ChannelID, res)
 		}
+	case "!vouch":
+		{
+			facade.Vouch(s, m)
+		}
+	case "!unvouch":
+		facade.UnVouch(s, m)
 	}
-
-}
-
-func getBotToken() string {
-	err := godotenv.Load("local.env")
-	if err != nil {
-		log.Fatalf("Some error occured. Err: %s", err)
-	}
-
-	return os.Getenv("BOT_TOKEN")
-
 }
