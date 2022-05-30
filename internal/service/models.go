@@ -19,3 +19,12 @@ type UserReg struct {
 type AllRoles struct {
 	VouchRole *discordgo.Role
 }
+
+type VouchedUsers struct {
+	UserWhoVouched string
+	VouchedUser    string
+}
+
+type JSONData struct {
+	Data []VouchedUsers
+}
