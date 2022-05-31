@@ -15,7 +15,7 @@ import (
 var i int
 
 func main() {
-	err := godotenv.Load("local.env")
+	err := godotenv.Load("./local.env")
 
 	fmt.Println(os.Getenv("BOT_TOKEN"))
 
