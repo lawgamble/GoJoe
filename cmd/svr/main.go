@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"goJoe/internal/facade"
+	"goJoe/internal/facade/vouch"
 	"os"
 	"strings"
 	"time"
@@ -63,9 +64,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	case "!vouch":
 		{
-			facade.Vouch(s, m)
+			vouch.Vouch(s, m)
 		}
 	case "!unvouch":
-		facade.UnVouch(s, m)
+		vouch.UnVouch(s, m)
 	}
 }
