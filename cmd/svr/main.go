@@ -16,6 +16,9 @@ var i int
 
 func main() {
 	err := godotenv.Load("./local.env")
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	fmt.Println(os.Getenv("BOT_TOKEN"))
 
