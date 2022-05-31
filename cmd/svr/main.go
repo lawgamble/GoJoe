@@ -17,6 +17,8 @@ var i int
 func main() {
 	err := godotenv.Load("local.env")
 
+	fmt.Println(os.Getenv("BOT_TOKEN"))
+
 	bot, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN")) //figure out how to get the token from .env
 	if err != nil {
 		panic(err)
