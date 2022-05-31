@@ -20,8 +20,6 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(os.Getenv("BOT_TOKEN"))
-
 	bot, err := discordgo.New("Bot " + os.Getenv("BOT_TOKEN")) //figure out how to get the token from .env
 	if err != nil {
 		panic(err)
