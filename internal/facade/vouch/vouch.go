@@ -38,11 +38,12 @@ func Vouch(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if vouchErr != nil {
 			return
 		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
+		successEmbed := embeds.CreateEmbed("VOUCHED!", "You've vouched for "+m.Mentions[0].Username+", \nso go forth and conquer!", "success")
+		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &successEmbed)
+		writeVouchedFile(m)
 	}
-	_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
-	successEmbed := embeds.CreateEmbed("VOUCHED!", "You've vouched for "+m.Mentions[0].Username+", \nso go forth and conquer!", "success")
-	_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &successEmbed)
-	writeVouchedFile(m)
+
 }
 
 func validateMentions(m *discordgo.MessageCreate) error {
@@ -51,7 +52,7 @@ func validateMentions(m *discordgo.MessageCreate) error {
 		err = fmt.Errorf(">1")
 		return err
 	}
-	if len(m.Mentions) == 0 {
+	if len(m.Mentions) == 0 || m.Mentions == nil {
 		err = fmt.Errorf("0")
 		return err
 	}
