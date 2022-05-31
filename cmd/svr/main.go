@@ -44,7 +44,7 @@ func ready(s *discordgo.Session, event *discordgo.Ready) {
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	if m.Author.ID == s.State.User.ID {
+	if m.Author.ID == os.Getenv("BOT_ID") {
 		return
 	}
 
