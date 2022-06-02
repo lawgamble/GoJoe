@@ -18,7 +18,7 @@ func writeVouchedFile(m *discordgo.MessageCreate) {
 	jsonFile, _ := ioutil.ReadFile("vouched.json")
 	_ = json.Unmarshal(jsonFile, &dataStruct)
 
-	if validateDuplicates(dataStruct, newVouch) {
+	if ValidateDuplicates(dataStruct, newVouch) {
 		return
 	}
 
@@ -28,7 +28,7 @@ func writeVouchedFile(m *discordgo.MessageCreate) {
 	_ = ioutil.WriteFile("vouched.json", bytes, 0644)
 }
 
-func validateDuplicates(d service.JSONData, newVouch service.VouchedUsers) bool {
+func ValidateDuplicates(d service.JSONData, newVouch service.VouchedUsers) bool {
 	vUsers := d.Data
 
 	for i := range vUsers {

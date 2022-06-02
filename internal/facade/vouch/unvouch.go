@@ -28,11 +28,33 @@ func UnVouch(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		s.ChannelMessageSend(os.Getenv("VOUCH_CHANNEL_ID"), fmt.Sprintf("<@%s>", m.Author.ID)+" has un-vouched for "+fmt.Sprintf("<@%s>", m.Mentions[0].ID))
 
+		removeVouchData(m)
+
 	} else {
 		errorEmbed := embeds.CreateEmbed("NO-CAN-DO!", "You can't un-vouch for "+m.Mentions[0].Username+".\nYou don't have permission.", "danger")
 
 		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &errorEmbed)
 	}
+}
+
+func removeVouchData(m *discordgo.MessageCreate) {
+	dataStruct := service.JSONData{}
+
+	newVouch := service.VouchedUsers{
+		UserWhoVouched: m.Author.ID,
+		VouchedUser:    m.Mentions[0].ID,
+	}
+	jsonFile, _ := ioutil.ReadFile("vouched.json")
+	_ = json.Unmarshal(jsonFile, &dataStruct)
+
+	for i := range dataStruct.Data {
+		if ValidateDuplicates(dataStruct, newVouch) {
+			dataStruct.Data = append(dataStruct.Data[:i], dataStruct.Data[i+1:]...)
+		}
+
+	}
+	bytes, _ := json.Marshal(&dataStruct)
+	_ = ioutil.WriteFile("vouched.json", bytes, 0644)
 }
 
 func canUserUnvouch(m *discordgo.MessageCreate) bool {
