@@ -4,46 +4,60 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goJoe/internal/embeds"
+	"goJoe/internal/facade/helpers"
 	"os"
 )
 
 //TODO send message to whatever channel to let everyone know who's vouching for who.
 
 func Vouch(s *discordgo.Session, m *discordgo.MessageCreate) {
+	err := vouchValidations(s, m)
+	if err != nil {
+		return
+	}
+
+	_ = giveUserVouchRole(s, m)
+
+	successEmbed := embeds.CreateEmbed("VOUCHED!", "Vouch successful", "success")
+	_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &successEmbed)
+
+	s.ChannelMessageSend(os.Getenv("VOUCH_CHANNEL_ID"), fmt.Sprintf("<@%s>", m.Author.ID)+" has vouched for "+fmt.Sprintf("<@%s>", m.Mentions[0].ID))
+
+	writeVouchedFile(m)
+}
+
+func vouchValidations(s *discordgo.Session, m *discordgo.MessageCreate) error {
+	if !helpers.IsUserLeagueMember(m) {
+		lmErr := fmt.Errorf("not League Member")
+		return lmErr
+	}
+
 	errEmbed := discordgo.MessageEmbed{}
-	userId := m.Author.ID
+
 	err := validateMentions(m)
+
 	if err != nil {
 		switch error.Error(err) {
 		case ">1":
 			{
 				errEmbed = embeds.CreateEmbed("NOPE", "You need to tag just ONE user", "danger")
-				_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
 				_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &errEmbed)
+				return err
 			}
 		case "0":
 			{
 				errEmbed = embeds.CreateEmbed("NOPE", "You need to tag a user", "danger")
-				_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
 				_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &errEmbed)
+				return err
 			}
 		case "dumbass":
 			{
-				_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
 				_, _ = s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/gordon-ramsay-idiot-sandwich-angry-mad-what-are-you-gif-4169547")
+				return err
 			}
 		}
-	} else {
-		vouchErr := giveUserVouchRole(s, m)
-		if vouchErr != nil {
-			return
-		}
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s>", userId))
-		successEmbed := embeds.CreateEmbed("VOUCHED!", "You've vouched for "+m.Mentions[0].Username+", \nso go forth and conquer!", "success")
-		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &successEmbed)
-		writeVouchedFile(m)
 	}
-
+	return nil
 }
 
 func validateMentions(m *discordgo.MessageCreate) error {

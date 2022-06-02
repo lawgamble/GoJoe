@@ -54,6 +54,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.Fields(m.Content)[0]
 
 	switch command {
+	case "!gostatus":
+		{
+			s.ChannelMessageSend(m.ChannelID, "I'm alive")
+		}
 	case "!enditall":
 		{
 			i = 1
@@ -67,9 +71,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	case "!vouch":
 		{
+			s.ChannelMessageDelete(m.ChannelID, m.ID)
 			vouch.Vouch(s, m)
 		}
 	case "!unvouch":
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		vouch.UnVouch(s, m)
 	}
 }
