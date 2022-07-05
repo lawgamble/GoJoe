@@ -11,6 +11,8 @@ import (
 //TODO send message to whatever channel to let everyone know who's vouching for who.
 
 func Vouch(s *discordgo.Session, m *discordgo.MessageCreate) {
+	_ = s.ChannelMessageDelete(m.ChannelID, m.ID)
+
 	err := vouchValidations(s, m)
 	if err != nil {
 		return

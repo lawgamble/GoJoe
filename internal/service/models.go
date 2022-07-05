@@ -2,6 +2,11 @@ package service
 
 import "github.com/bwmarrin/discordgo"
 
+type Handler struct {
+	Session *discordgo.Session
+	Message *discordgo.MessageCreate
+}
+
 type UserResponse struct {
 	Found   bool      `json:"Found"`
 	UserReg []UserReg `json:"UserReg"`
@@ -27,4 +32,12 @@ type VouchedUsers struct {
 
 type JSONData struct {
 	Data []VouchedUsers
+}
+
+type RegisterUserRequest struct {
+	RegOrg      string `json:"regOrg"`
+	DiscordID   string `json:"DiscordId"`
+	PavlovName  string `json:"PavlovName"`
+	DiscordName string `json:"DiscordName"`
+	OculusName  string `json:"OculusName"`
 }

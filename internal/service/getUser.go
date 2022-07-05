@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const getUserURL = "http://45.77.195.189:8123/findUserDiscordId/"
+const getUserURL = "http://45.77.195.189:8123/findPCLUserDiscordId/"
 
 func GetUserData(userId string) (user UserResponse) {
 	userURL := getUserURL + userId
