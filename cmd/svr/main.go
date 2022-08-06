@@ -56,6 +56,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if tripleCrown.TCActive && m.Author.ID == tripleCrown.TCUserId {
 		tripleCrown.CollectMessages(s, m)
+		return
 	}
 
 	command := strings.Fields(m.Content)[0]
