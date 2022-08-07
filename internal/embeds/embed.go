@@ -6,6 +6,7 @@ import (
 )
 
 var NotRegisteredEmbed = CreateEmbed("You need to register!", "Use the `!register <NAME>` command to register with PCL.", "danger")
+var OpponentNotRegisteredEmbed = CreateEmbed("Your opponent is not registered!", "They need to be registered before you can input scores!", "danger")
 var TimeoutEmbed = CreateEmbed("Process Timeout", "You took too long! Try again.", "danger")
 var SuccessEmbed = CreateEmbed("Process Complete", "Success!", "success")
 var NotCorrect = CreateEmbed("Try Again", "You can go ahead and try again.\nBe honest and accurate!", "danger")

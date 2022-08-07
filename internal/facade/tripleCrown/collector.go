@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goJoe/internal/embeds"
+	"log"
+	"regexp"
 	"strings"
 )
 
@@ -13,11 +15,24 @@ func CollectMessages(s *discordgo.Session, m *discordgo.MessageCreate) {
 		result <- struct{}{}
 		return
 	}
-
-	collectionPool = append(collectionPool, m.Content)
+	if len(collectionPool) == 0 {
+		opponentId := extractId(m.Content)
+		registered, opponent := validateRegistration(opponentId)
+		if !registered {
+			chanResult = "notRegistered"
+			result <- struct{}{}
+			return
+		}
+		Opponent = opponent.UserReg[0]
+		// send data to DB
+		collectionPool = append(collectionPool, Opponent.OculusName)
+	} else {
+		collectionPool = append(collectionPool, m.Content)
+	}
 
 	switch len(collectionPool) {
 	case 1:
+		fmt.Println(collectionPool[0])
 		msg2 := embeds.CreateEmbed("Map", "What map did you play on?", "gold")
 		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &msg2)
 
@@ -46,4 +61,14 @@ func CollectMessages(s *discordgo.Session, m *discordgo.MessageCreate) {
 			result <- struct{}{}
 		}
 	}
+}
+
+func extractId(content string) string {
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	id := reg.ReplaceAllString(content, "")
+
+	return id
 }

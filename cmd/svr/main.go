@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
+	"github.com/bwmarrin/discordgo"
+	"github.com/joho/godotenv"
 	"goJoe/internal/facade"
 	"goJoe/internal/facade/repeat"
 	"goJoe/internal/facade/status"
 	"goJoe/internal/facade/tripleCrown"
 	"goJoe/internal/facade/vouch"
 	"os"
+	"os/signal"
 	"strings"
-	"time"
-
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
+	"syscall"
 )
 
 var i int
@@ -36,12 +36,14 @@ func main() {
 		fmt.Println("Error opening Discord session: ", err)
 	}
 
-	for {
-		if i == 1 {
-			time.Sleep(time.Second * 3)
-			return
-		}
-	} // this for loop keeps the bot running until i == 1
+	// Wait here until CTRL-C or other term signal is received.
+	fmt.Println("Bot is now running. Press CTRL-C to exit.")
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
+	// Cleanly close down the Discord session.
+	bot.Close()
 }
 
 func ready(s *discordgo.Session, e *discordgo.Ready) {
@@ -102,6 +104,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				s.ChannelMessageSendEmbed(m.ChannelID, &embed)
 			}
 		}
+	case "tcteam":
+		// read a file and check the value of flag
 	}
 
 }

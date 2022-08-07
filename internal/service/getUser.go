@@ -5,12 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
-const getUserURL = "http://45.77.195.189:8123/findPCLUserDiscordId/"
-
 func GetUserData(userId string) (user UserResponse) {
-	userURL := getUserURL + userId
+	userURL := os.Getenv("GETUSERURL") + userId
 	resp, err := http.Get(userURL)
 	if err != nil {
 		log.Println(err)

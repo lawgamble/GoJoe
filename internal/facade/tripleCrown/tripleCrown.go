@@ -2,10 +2,9 @@ package tripleCrown
 
 import (
 	"context"
-	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goJoe/internal/embeds"
-	"runtime"
+	"goJoe/internal/service"
 	"time"
 )
 
@@ -17,13 +16,23 @@ var chanResult string
 
 var result chan struct{}
 
+var Challenger service.UserReg
+var Opponent service.UserReg
+
 func TCrown(s *discordgo.Session, m *discordgo.MessageCreate) discordgo.MessageEmbed {
-	fmt.Println(runtime.NumGoroutine())
-	if registered := validateRegistration(m.Author.ID); !registered {
+	db, err := startDB()
+	if err != nil {
+		errorMsg := embeds.CreateEmbed("Can't Connect to DB", "I had trouble connecting to the database. Try again, bro.", "gold")
+		return errorMsg
+	}
+	defer db.Close()
+
+	registered, userData := validateRegistration(m.Author.ID)
+	if !registered {
 		return embeds.NotRegisteredEmbed
 	}
 
-	setGlobalVars(m)
+	setGlobalVars(m, userData)
 	sendUserFirstMessage(s, m)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -43,6 +52,10 @@ func TCrown(s *discordgo.Session, m *discordgo.MessageCreate) discordgo.MessageE
 		if chanResult == "cancel" {
 			resetGlobalVars()
 			break
+		}
+		if chanResult == "notRegistered" {
+			resetGlobalVars()
+			return embeds.OpponentNotRegisteredEmbed
 		}
 		if chanResult == "complete" {
 			resetGlobalVars()
@@ -67,14 +80,18 @@ func sendUserFirstMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 	_, _ = s.ChannelMessageSendEmbed(m.ChannelID, &msg1)
 }
 
-func setGlobalVars(m *discordgo.MessageCreate) {
+func setGlobalVars(m *discordgo.MessageCreate, c service.UserResponse) {
+	Challenger = c.UserReg[0]
+	TCUserName = c.UserReg[0].OculusName
 	TCActive = true
 	TCUserId = m.Author.ID
 	result = make(chan struct{}, 1)
 }
 
 func resetGlobalVars() {
-	TCActive = false
+	Challenger = service.UserReg{}
+	TCUserName = ""
 	TCUserId = ""
+	TCActive = false
 	collectionPool = []string{}
 }

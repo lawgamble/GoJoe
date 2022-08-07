@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/bwmarrin/discordgo v0.25.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/joho/godotenv v1.4.0
 )
 
