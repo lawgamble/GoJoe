@@ -15,8 +15,6 @@ import (
 	"syscall"
 )
 
-var i int
-
 func main() {
 	err := godotenv.Load("./local.env")
 	if err != nil {
@@ -67,12 +65,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "!gostatus":
 		{
 			status.BotStatus(s, m)
-			break
-		}
-	case "!enditall":
-		{
-			i = 1
-			s.ChannelMessageSend(m.ChannelID, "Goodbye!")
 			break
 		}
 	case "!register":
