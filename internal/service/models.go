@@ -1,6 +1,8 @@
 package service
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+)
 
 type Handler struct {
 	Session *discordgo.Session

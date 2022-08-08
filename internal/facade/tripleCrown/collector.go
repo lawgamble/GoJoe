@@ -24,7 +24,12 @@ func CollectMessages(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		Opponent = opponent.UserReg[0]
-		// send data to DB
+		uploadError := S.UploadUserData(Opponent)
+		if uploadError != nil {
+			errorMsg := embeds.CreateEmbed("Can't upload to DB", fmt.Sprintf("I had trouble uploading to the database: %v", uploadError), "gold")
+			s.ChannelMessageSendEmbed(m.ChannelID, &errorMsg)
+			return
+		}
 		collectionPool = append(collectionPool, Opponent.OculusName)
 	} else {
 		collectionPool = append(collectionPool, m.Content)
